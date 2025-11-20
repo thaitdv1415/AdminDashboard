@@ -1,0 +1,5 @@
+{
+  "name": "SmartLock Admin System",
+  "description": "Hệ thống quản lý tủ khóa thông minh, theo dõi trạng thái locker, pin, và báo cáo doanh thu vận hành.",
+  "requestFramePermissions": []
+}
