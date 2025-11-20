@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, Settings, PieChart, LogOut, Box, Lock } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, PieChart, LogOut, Box, Lock, Wallet, History, PlusCircle } from 'lucide-react';
 import { AppRoute } from '../types';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -15,10 +15,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
   const { user, logout } = useAuth();
 
   const navItems = [
-    { name: 'Tổng quan', icon: <LayoutDashboard size={20} />, route: AppRoute.DASHBOARD, roles: ['Admin', 'User'] },
-    { name: 'Quản lý Tủ', icon: <Box size={20} />, route: AppRoute.LOCKERS, roles: ['Admin', 'User'] },
+    // Admin Routes
+    { name: 'Tổng quan', icon: <LayoutDashboard size={20} />, route: AppRoute.DASHBOARD, roles: ['Admin', 'Manager'] },
+    { name: 'Quản lý Tủ', icon: <Box size={20} />, route: AppRoute.LOCKERS, roles: ['Admin', 'Manager', 'Staff', 'Technician'] },
     { name: 'Người dùng', icon: <Users size={20} />, route: AppRoute.USERS, roles: ['Admin'] },
     { name: 'Báo cáo', icon: <PieChart size={20} />, route: AppRoute.ANALYTICS, roles: ['Admin'] },
+    
+    // Client Routes
+    { name: 'Trang chủ', icon: <LayoutDashboard size={20} />, route: AppRoute.CLIENT_HOME, roles: ['User', 'Courier'] },
+    { name: 'Thuê tủ mới', icon: <PlusCircle size={20} />, route: AppRoute.CLIENT_RENT, roles: ['User'] },
+    { name: 'Ví của tôi', icon: <Wallet size={20} />, route: AppRoute.CLIENT_WALLET, roles: ['User', 'Courier'] },
+    { name: 'Lịch sử', icon: <History size={20} />, route: AppRoute.CLIENT_HISTORY, roles: ['User'] },
+    
+    // Settings
     { name: 'Cấu hình', icon: <Settings size={20} />, route: AppRoute.SETTINGS, roles: ['Admin'] },
   ];
 

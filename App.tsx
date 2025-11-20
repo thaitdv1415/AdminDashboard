@@ -5,6 +5,9 @@ import { Header } from './components/Header';
 import { Dashboard } from './components/Dashboard';
 import { UserList } from './components/UserList';
 import { LockerGrid } from './components/LockerGrid';
+import { ClientDashboard } from './components/client/ClientDashboard';
+import { BookingWizard } from './components/client/BookingWizard';
+import { ClientHistory } from './components/client/ClientHistory';
 import { Login } from './components/Login';
 import { Register } from './components/Register';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -23,7 +26,6 @@ const PrivateRoute: React.FC<{ children: React.ReactNode, roles?: string[] }> = 
   }
 
   if (roles && !roles.includes(user.role)) {
-    // User is logged in but doesn't have permission
     return (
         <div className="flex h-full flex-col items-center justify-center p-8 text-center">
             <h2 className="text-2xl font-bold text-gray-900">Access Denied</h2>
@@ -92,24 +94,31 @@ const SettingsPlaceholder = () => (
 );
 
 const AppRoutes = () => {
+    const { user } = useAuth();
+    
+    // Redirect based on role if at root
+    if(window.location.hash === '#/' && user?.role === 'User') {
+        return <Navigate to={AppRoute.CLIENT_HOME} replace />;
+    }
+
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
+            {/* Admin Routes */}
             <Route path={AppRoute.DASHBOARD} element={
-                <PrivateRoute>
+                <PrivateRoute roles={['Admin', 'Manager', 'Technician']}>
                     <Dashboard />
                 </PrivateRoute>
             } />
             
             <Route path={AppRoute.LOCKERS} element={
-                <PrivateRoute>
+                <PrivateRoute roles={['Admin', 'Manager', 'Staff', 'Technician']}>
                     <LockerGrid />
                 </PrivateRoute>
             } />
             
-            {/* Admin Only Routes */}
             <Route path={AppRoute.USERS} element={
                 <PrivateRoute roles={['Admin']}>
                     <UserList />
@@ -128,7 +137,32 @@ const AppRoutes = () => {
                 </PrivateRoute>
             } />
 
-            <Route path="*" element={<Navigate to={AppRoute.DASHBOARD} replace />} />
+            {/* Client/User Routes */}
+            <Route path={AppRoute.CLIENT_HOME} element={
+                <PrivateRoute roles={['User', 'Courier']}>
+                    <ClientDashboard />
+                </PrivateRoute>
+            } />
+
+            <Route path={AppRoute.CLIENT_RENT} element={
+                <PrivateRoute roles={['User']}>
+                    <BookingWizard />
+                </PrivateRoute>
+            } />
+            
+             <Route path={AppRoute.CLIENT_WALLET} element={
+                <PrivateRoute roles={['User', 'Courier']}>
+                     <ClientDashboard /> {/* Just show dashboard with wallet modal trigger for now */}
+                </PrivateRoute>
+            } />
+
+            <Route path={AppRoute.CLIENT_HISTORY} element={
+                <PrivateRoute roles={['User']}>
+                    <ClientHistory />
+                </PrivateRoute>
+            } />
+
+            <Route path="*" element={<Navigate to={user?.role === 'User' ? AppRoute.CLIENT_HOME : AppRoute.DASHBOARD} replace />} />
         </Routes>
     );
 };
